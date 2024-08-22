@@ -3,8 +3,8 @@ import React, { useState, useRef, use, useEffect } from 'react';
 import axios from 'axios';
 import { SimliClient } from 'simli-client';
 
-const simli_faceid = '5514e24d-6086-46a3-ace4-6a7264e5cb7c';
-const elevenlabs_voiceid = 'onwK4e9ZLuTAKqWW03F9';
+const simli_faceid = '90730ca4-30e6-41e5-bf87-22b5fa8316eb';
+const elevenlabs_voiceid = 'nPijfmaNgvm5OSN4xM8H';
 
 const simliClient = new SimliClient();
 
@@ -70,7 +70,7 @@ const Demo = () => {
       const chatGPTResponse = await axios.post(
         'https://api.openai.com/v1/chat/completions',
         {
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4o-mini',
           messages: [{ role: 'user', content: inputText }],
         },
         {
