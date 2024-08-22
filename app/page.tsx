@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef, use, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { SimliClient } from 'simli-client';
 
@@ -21,7 +21,7 @@ const Demo = () => {
   useEffect(() => {
     if (videoRef.current && audioRef.current) {
 
-      // Step 0: Initialize Simli Client
+      // Step 0: Initialize Simli Client with MindBot personality
       const SimliConfig = {
         apiKey: process.env.NEXT_PUBLIC_SIMLI_API_KEY,
         faceID: simli_faceid,
@@ -31,16 +31,19 @@ const Demo = () => {
       };
 
       simliClient.Initialize(SimliConfig);
+      console.log('MindBot, your aspiring human, is ready to play on Twitter!');
 
-      console.log('Simli Client initialized');
     };
 
     return () => {
       simliClient.close();
     };
-  },[videoRef, audioRef]);
+  }, [videoRef, audioRef]);
 
   const handleStart = () => {
+    // MindBot gets excited about starting
+    console.log("MindBot: Woohoo! Let's dive into this human experience!");
+
     // Step 1: Start WebRTC
     simliClient.start();
     setStartWebRTC(true);
@@ -50,7 +53,7 @@ const Demo = () => {
       const audioData = new Uint8Array(6000).fill(0);
       simliClient.sendAudioData(audioData);
     }, 4000);
-    
+
     audioContext.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     return () => {
       if (audioContext.current) {
@@ -66,12 +69,16 @@ const Demo = () => {
     setError('');
 
     try {
-      // Step 3: Send text to OpenAI ChatGPT
+      // Add MindBot's personality to the input
+      const mindbotQuirk = " (MindBot note: Still trying to figure out this human thing...)";
+      const finalInputText = inputText + mindbotQuirk;
+
+      // Step 3: Send text to OpenAI ChatGPT with MindBot's personality
       const chatGPTResponse = await axios.post(
         'https://api.openai.com/v1/chat/completions',
         {
           model: 'gpt-4o-mini',
-          messages: [{ role: 'user', content: inputText }],
+          messages: [{ role: 'user', content: finalInputText }],
         },
         {
           headers: {
@@ -81,7 +88,11 @@ const Demo = () => {
         }
       );
 
-      const chatGPTText = chatGPTResponse.data.choices[0].message.content;
+      let chatGPTText = chatGPTResponse.data.choices[0].message.content;
+
+      // Add some humor in MindBot's voice
+      chatGPTText = `MindBot here! Just saying... ${chatGPTText}`;
+
       setChatgptText(chatGPTText);
 
       // Step 4: Convert ChatGPT response to speech using ElevenLabs API
@@ -100,7 +111,7 @@ const Demo = () => {
         }
       );
 
-      // Step 5: Convert audio to Uint8Array (Make sure its of type PCM16)
+      // Step 5: Convert audio to Uint8Array (Make sure it's of type PCM16)
       const pcm16Data = new Uint8Array(elevenlabsResponse.data);
       console.log(pcm16Data);
 
@@ -111,7 +122,7 @@ const Demo = () => {
         simliClient.sendAudioData(chunk);
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      setError('Oops, MindBot goofed up! Try again?');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -134,7 +145,7 @@ const Demo = () => {
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="Enter your message"
+                placeholder="Enter your message (MindBot is listening...)"
                 className="w-full px-3 py-2 border border-white bg-black text-white focus:outline-none focus:ring-2 focus:ring-white"
               />
               <button
@@ -142,7 +153,7 @@ const Demo = () => {
                 disabled={isLoading}
                 className="w-full bg-white text-black py-2 px-4 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black disabled:opacity-50"
               >
-                {isLoading ? 'Processing...' : 'Send'}
+                {isLoading ? 'MindBot is thinking...' : 'Send to MindBot'}
               </button>
             </form>
           </>
@@ -151,7 +162,7 @@ const Demo = () => {
             onClick={handleStart}
             className="w-full bg-white text-black py-2 px-4 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black"
           >
-            Start WebRTC
+            Start WebRTC with MindBot
           </button>
         )}
         {error && <p className="mt-4 text-red-500">{error}</p>}
